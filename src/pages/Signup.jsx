@@ -7,13 +7,20 @@ import { createMentorProfile } from "../services/mentorService";
 const EXPERTISE_OPTIONS = ["React","JavaScript","Python","DSA","System Design","Node.js","SQL","Machine Learning"];
 
 export default function Signup() {
-  const [form, setForm] = useState({ name:"", email:"", password:"", role:"student", bio:"", expertise:[] });
+  const [form, setForm] = useState({ name:"", email:"", password:"", role:"student", bio:"", expertise:[], customExpertise:"" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
   const navigate = useNavigate();
 
   const toggleExp = (e) => setForm(f => ({ ...f, expertise: f.expertise.includes(e) ? f.expertise.filter(x=>x!==e) : [...f.expertise, e] }));
+
+  const addCustomExpertise = () => {
+    const custom = form.customExpertise.trim();
+    if (custom && !form.expertise.includes(custom)) {
+      setForm(f => ({ ...f, expertise: [...f.expertise, custom], customExpertise: "" }));
+    }
+  };
 
   const handleSubmit = async (ev) => {
     ev.preventDefault();
@@ -73,17 +80,55 @@ export default function Signup() {
               </div>
               <div style={{ marginBottom: 20 }}>
                 <label style={{ fontSize: 13, fontWeight: 500, color: "rgba(109,66,28,0.82)", display: "block", marginBottom: 8 }}>Areas of Expertise</label>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
-                  {EXPERTISE_OPTIONS.map(e => (
-                    <button key={e} type="button" onClick={()=>toggleExp(e)} style={{
-                      fontSize: 12, padding: "5px 12px", borderRadius: 999, cursor: "pointer", transition: "all 0.2s", fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-                      background: form.expertise.includes(e) ? "linear-gradient(135deg, #ebb86d, #d78d3f)" : "rgba(255,249,238,0.78)",
-                      color: form.expertise.includes(e) ? "white" : "rgba(109,66,28,0.7)",
-                      border: form.expertise.includes(e) ? "1px solid transparent" : "1px solid rgba(221,184,133,0.42)",
-                      boxShadow: form.expertise.includes(e) ? "0 2px 8px rgba(201,122,43,0.24)" : "none",
-                    }}>{e}</button>
-                  ))}
+                <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+                  <input
+                    type="text"
+                    value={form.customExpertise}
+                    onChange={e => setForm(f => ({ ...f, customExpertise: e.target.value }))}
+                    placeholder="e.g., English, Math, Cooking"
+                    className="glass-input"
+                    style={{ flex: 1 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={addExpertise}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: 8,
+                      background: "linear-gradient(135deg, #ebb86d, #d78d3f)",
+                      color: "white",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Add
+                  </button>
                 </div>
+                {form.expertise.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+                    {form.expertise.map(e => (
+                      <span
+                        key={e}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 6,
+                          fontSize: 12,
+                          padding: "4px 8px",
+                          borderRadius: 999,
+                          background: "linear-gradient(135deg, #ebb86d, #d78d3f)",
+                          color: "white",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => removeExpertise(e)}
+                      >
+                        {e} ×
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </>)}
 
